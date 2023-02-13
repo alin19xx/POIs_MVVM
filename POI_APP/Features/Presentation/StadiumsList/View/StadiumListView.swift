@@ -13,6 +13,9 @@ class StadiumListView: UIViewController, UISearchResultsUpdating {
         static let searchPlaceholderText = "Search stadiums"
         static let navBarTitle = "Stadiums"
         static let pullToRefreshText = "Pull to refresh"
+        static let errorTitle = "Ups"
+        static let errorMessage = "Something went wrong :("
+        static let alertButton = "Refresh"
     }
     
     var viewModel: StadiumsListViewModel = DefaultStadiumsListViewModel()
@@ -104,6 +107,14 @@ class StadiumListView: UIViewController, UISearchResultsUpdating {
             
             self.mainCoordinator?.pushDetailStadiumViewController(model: selectedModel)
         }
+        
+        viewModel.showErrorAlert.bind { [weak self] showError in
+            guard let self = self,
+                  let showError = showError, showError else { return }
+            DispatchQueue.main.async {
+                self.showErrorAlert()
+            }
+        }
     }
     
     @objc func refresh(_ sender: AnyObject) {
@@ -122,6 +133,22 @@ class StadiumListView: UIViewController, UISearchResultsUpdating {
         ])
     }
 }
+
+// MARK: - Alert
+
+extension StadiumListView {
+    
+    private func showErrorAlert() {
+        let alert = UIAlertController(title: Constants.errorTitle, message: Constants.errorMessage, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Constants.alertButton, style: .cancel, handler: { _ in
+            self.viewModel.viewDidLoad()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
 
 // MARK: - UISearchResultsUpdating
 

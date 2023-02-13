@@ -61,7 +61,7 @@ extension DefaultStadiumsUseCase {
     }
     
     private func saveStadiumListOnCache(stadiums: StadiumsEntity) {
-        var stadiumListToCache = StructWrapper<StadiumsEntity>(stadiums)
+        let stadiumListToCache = StructWrapper<StadiumsEntity>(stadiums)
         
         self.cache.setObject(stadiumListToCache, forKey: Constants.stadiumsKey)
         debugPrint("INFO: Cached data")

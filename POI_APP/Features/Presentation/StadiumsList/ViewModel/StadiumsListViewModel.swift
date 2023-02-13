@@ -19,6 +19,7 @@ protocol StadiumsListViewModelOuput {
     var isSearching: Box<Bool> { get }
     var stadiumsUseCase: StadiumsUseCase? { get }
     var selectedStadium: Box<StadiumModel?> { get }
+    var showErrorAlert: Box<Bool?> { get set }
     
     func filterContentForSearchText(_ searchText: String)
 }
@@ -32,6 +33,7 @@ final class DefaultStadiumsListViewModel: StadiumsListViewModel {
     var isSearching: Box<Bool> = Box(false)
     var selectedStadium: Box<StadiumModel?> = Box(nil)
     var stadiumsUseCase: StadiumsUseCase?
+    var showErrorAlert: Box<Bool?> = Box(nil)
     
     init(stadiumsUseCase: StadiumsUseCase = DefaultStadiumsUseCase()) {
         self.stadiumsUseCase = stadiumsUseCase
@@ -48,14 +50,14 @@ final class DefaultStadiumsListViewModel: StadiumsListViewModel {
             switch result {
             case .success(let entity):
                 self.model.value = StadiumListModel(entity: entity)
-            case .failure(let error):
-                break
+            case .failure(_):
+                self.showErrorAlert.value = true
             }
         })
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        var stadiumFilteredList = model.value?.stadiums.filter({ $0.title.contains(searchText) })
+        let stadiumFilteredList = model.value?.stadiums.filter({ $0.title.contains(searchText) })
         
         modelResults.value = StadiumListModel(models: stadiumFilteredList ?? [])
     }
